@@ -1,7 +1,6 @@
 # go-csv
 
-This tiny tool now provides the following functionalities:
-- Automatically detects the CSV delimiter. It fully conforms to the specifications outlined on the on the [Wikipedia article][csv].
+This tiny tool is dedicated to automatically detects the CSV delimiter. It fully conforms to the specifications outlined on the on the [Wikipedia article][csv]. Looking through many CSV libraries code and discussion on the stackoverflow, finding that their CSV delimiter detection is limited or incomplete or containing many unneeded features. Hoping this can people solve the CSV delimiter detection problem without importing extra overhead.
 
 [csv]: http://en.wikipedia.org/wiki/Comma-separated_values
 
