@@ -1,10 +1,11 @@
 package detector
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
 	"os"
 	"regexp"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIsPotentialDelimiter(t *testing.T) {
@@ -35,7 +36,7 @@ func TestIsPotentialDelimiter(t *testing.T) {
 	}
 
 	detector := &detector{
-		nonDelimiterRegex : regexp.MustCompile(nonDelimiterRegexString),
+		nonDelimiterRegex: regexp.MustCompile(nonDelimiterRegexString),
 	}
 	for _, test := range tests {
 		assert.Equal(t, test.expected, !detector.nonDelimiterRegex.MatchString(string(test.input)))
@@ -65,7 +66,7 @@ func TestDetectDelimiter(t *testing.T) {
 }
 
 func TestDetectorSample(t *testing.T) {
-	detector := &detector{}
+	detector := New().(*detector)
 
 	file, err := os.OpenFile("./Fixtures/test1.csv", os.O_RDONLY, os.ModePerm)
 	assert.NoError(t, err)
@@ -73,16 +74,16 @@ func TestDetectorSample(t *testing.T) {
 
 	actual, line := detector.sample(file, 15, '"')
 	expected := frequencyTable{
-		'.' : map[int]int{
+		'.': map[int]int{
 			2: 1,
 			3: 1,
 			4: 1,
 			5: 1,
 		},
-		' ' : map[int]int{
+		' ': map[int]int{
 			5: 1,
 		},
-		',' : map[int]int{
+		',': map[int]int{
 			1: 4,
 			2: 4,
 			3: 4,
@@ -99,16 +100,16 @@ func TestDetectorSample(t *testing.T) {
 
 func TestDetectAnalyze(t *testing.T) {
 	ft := frequencyTable{
-		'.' : map[int]int{
+		'.': map[int]int{
 			2: 1,
 			3: 1,
 			4: 1,
 			5: 1,
 		},
-		' ' : map[int]int{
+		' ': map[int]int{
 			5: 1,
 		},
-		',' : map[int]int{
+		',': map[int]int{
 			1: 4,
 			2: 4,
 			3: 4,
