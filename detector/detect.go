@@ -2,20 +2,20 @@ package detector
 
 import (
 	"bufio"
-	"regexp"
-	"math"
 	"io"
+	"math"
+	"regexp"
 )
 
 const (
-	sampleLines = 15
+	sampleLines             = 15
 	nonDelimiterRegexString = `[[:alnum:]\n\r]`
 )
 
 // New a detector.
 func New() Detector {
 	return &detector{
-		nonDelimiterRegex : regexp.MustCompile(nonDelimiterRegexString),
+		nonDelimiterRegex: regexp.MustCompile(nonDelimiterRegexString),
 	}
 }
 
@@ -62,19 +62,19 @@ func (d *detector) sample(reader io.Reader, sampleLines int, enclosure byte) (fr
 			current = buf[i]
 
 			if i > 0 {
-				prev = buf[i - 1]
+				prev = buf[i-1]
 			} else {
 				prev = byte(0)
 			}
 
-			if i < n - 1 {
-				next = buf[i + 1]
+			if i < n-1 {
+				next = buf[i+1]
 			} else {
 				next = byte(0)
 			}
 
 			if current == enclosure {
-				if (!enclosed || next != enclosure) {
+				if !enclosed || next != enclosure {
 					if enclosed {
 						enclosed = false
 					} else {
@@ -86,7 +86,7 @@ func (d *detector) sample(reader io.Reader, sampleLines int, enclosure byte) (fr
 			} else if (current == '\n' && prev != '\r' || current == '\r') && !enclosed {
 				actualSampleLines++
 				if actualSampleLines >= sampleLines {
-					break;
+					break
 				}
 			} else if !enclosed {
 				if !d.nonDelimiterRegex.MatchString(string(current)) {
