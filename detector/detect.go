@@ -85,8 +85,9 @@ func (d *detector) sample(reader io.Reader, sampleLines int, enclosure byte) (fr
 				}
 			} else if (current == '\n' && prev != '\r' || current == '\r') && !enclosed {
 				actualSampleLines++
-				if actualSampleLines >= sampleLines {
-					break
+				if actualSampleLines > sampleLines {
+					actualSampleLines--
+					return
 				}
 			} else if !enclosed {
 				if !d.nonDelimiterRegex.MatchString(string(current)) {
