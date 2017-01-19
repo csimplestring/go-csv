@@ -123,3 +123,15 @@ func TestDetectAnalyze(t *testing.T) {
 
 	assert.Equal(t, []byte{','}, candidates)
 }
+
+func TestDetectLargeFile(t *testing.T) {
+	detector := New()
+
+	file, err := os.OpenFile("./Fixtures/test2.csv", os.O_RDONLY, os.ModePerm)
+	assert.NoError(t, err)
+	defer file.Close()
+
+	delimiters := detector.DetectDelimiter(file, '"')
+
+	assert.Equal(t, []string{","}, delimiters)
+}
