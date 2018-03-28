@@ -53,9 +53,10 @@ func TestFrequencyTable(t *testing.T) {
 	assert.Equal(t, 2, ft['|'][3])
 }
 
-func TestDetectDelimiter(t *testing.T) {
+func TestDetectDelimiterComma(t *testing.T) {
 	detector := New()
-
+	sampleLines := 4
+	detector.Configure(&sampleLines, nil)
 	file, err := os.OpenFile("./Fixtures/test1.csv", os.O_RDONLY, os.ModePerm)
 	assert.NoError(t, err)
 	defer file.Close()
@@ -63,6 +64,19 @@ func TestDetectDelimiter(t *testing.T) {
 	delimiters := detector.DetectDelimiter(file, '"')
 
 	assert.Equal(t, []string{","}, delimiters)
+}
+
+func TestDetectDelimiterSemicolon(t *testing.T) {
+	detector := New()
+	sampleLines := 4
+	detector.Configure(&sampleLines, nil)
+	file, err := os.OpenFile("./Fixtures/test2.csv", os.O_RDONLY, os.ModePerm)
+	assert.NoError(t, err)
+	defer file.Close()
+
+	delimiters := detector.DetectDelimiter(file, '"')
+
+	assert.Equal(t, []string{";"}, delimiters)
 }
 
 func TestDetectorSample(t *testing.T) {
@@ -74,15 +88,6 @@ func TestDetectorSample(t *testing.T) {
 
 	actual, line := detector.sample(file, 15, '"')
 	expected := frequencyTable{
-		'.': map[int]int{
-			2: 1,
-			3: 1,
-			4: 1,
-			5: 1,
-		},
-		' ': map[int]int{
-			5: 1,
-		},
 		',': map[int]int{
 			1: 4,
 			2: 4,
