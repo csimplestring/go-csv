@@ -9,36 +9,47 @@ import (
 
 const (
 	sampleLines             = 15
-	nonDelimiterRegexString = `[[:alnum:]\n\r]`
+	nonDelimiterRegexString = `[[:alnum:]\n\r@\. ]`
 )
 
 // New a detector.
 func New() Detector {
 	return &detector{
 		nonDelimiterRegex: regexp.MustCompile(nonDelimiterRegexString),
+		sampleLines:       sampleLines,
 	}
 }
 
 // Detector defines the exposed interface.
 type Detector interface {
 	DetectDelimiter(reader io.Reader, enclosure byte) []string
+	Configure(SampleLines *int, nonDelimiterRegexString *string)
 }
 
 // detector is the default implementation of Detector.
 type detector struct {
 	nonDelimiterRegex *regexp.Regexp
+	sampleLines       int
 }
 
 // DetectDelimiter finds a slice of delimiter string.
 func (d *detector) DetectDelimiter(reader io.Reader, enclosure byte) []string {
-	statistics, totalLines := d.sample(reader, sampleLines, enclosure)
-
+	statistics, totalLines := d.sample(reader, d.sampleLines, enclosure)
 	var candidates []string
 	for _, delimiter := range d.analyze(statistics, totalLines) {
 		candidates = append(candidates, string(delimiter))
 	}
 
 	return candidates
+}
+
+func (d *detector) Configure(sampleLines *int, nonDelimiterRegexString *string) {
+	if sampleLines != nil {
+		d.sampleLines = *sampleLines
+	}
+	if nonDelimiterRegexString != nil {
+		d.nonDelimiterRegex = regexp.MustCompile(*nonDelimiterRegexString)
+	}
 }
 
 // sample reads lines and walks through each character, records the frequencies of each candidate delimiter
@@ -72,7 +83,6 @@ func (d *detector) sample(reader io.Reader, sampleLines int, enclosure byte) (fr
 			} else {
 				next = byte(0)
 			}
-
 			if current == enclosure {
 				if !enclosed || next != enclosure {
 					if enclosed {
@@ -83,11 +93,11 @@ func (d *detector) sample(reader io.Reader, sampleLines int, enclosure byte) (fr
 				} else {
 					i++
 				}
-			} else if (current == '\n' && prev != '\r' || current == '\r') && !enclosed {
-				actualSampleLines++
-				if actualSampleLines >= sampleLines {
-					break
+			} else if (current == '\n' && prev != '\r' && next != byte(0) && next != '\n' || current == '\r') && !enclosed {
+				if actualSampleLines == sampleLines {
+					return
 				}
+				actualSampleLines++
 			} else if !enclosed {
 				if !d.nonDelimiterRegex.MatchString(string(current)) {
 					frequencies.increment(current, actualSampleLines)
