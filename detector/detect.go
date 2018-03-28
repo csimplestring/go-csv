@@ -3,6 +3,7 @@ package detector
 import (
 	"bufio"
 	"io"
+	// "log"
 	"math"
 	"regexp"
 )
@@ -145,10 +146,21 @@ func (d *detector) analyze(ft frequencyTable, sampleLine int) []byte {
 	}
 
 	var candidates []byte
+	var minDeviation float64
+	var minDelimiter byte
 	for delimiter, frequencyOfLine := range ft {
-		if float64(0.0) == deviation(frequencyOfLine, sampleLine) {
+		dev := deviation(frequencyOfLine, sampleLine)
+		if float64(0.0) == dev {
 			candidates = append(candidates, delimiter)
+		} else if minDeviation > dev || minDeviation == 0 {
+			// find minimum deviation available
+			minDeviation = dev
+			minDelimiter = delimiter
 		}
+	}
+	// if zero deviation candidates are not found, pick the minimum one
+	if len(candidates) == 0 && minDeviation > 0 {
+		candidates = append(candidates, minDelimiter)
 	}
 
 	return candidates

@@ -66,6 +66,19 @@ func TestDetectDelimiterComma(t *testing.T) {
 	assert.Equal(t, []string{","}, delimiters)
 }
 
+func TestDetectDelimiterComma2(t *testing.T) {
+	detector := New()
+	sampleLines := 4
+	detector.Configure(&sampleLines, nil)
+	file, err := os.OpenFile("./Fixtures/test3.csv", os.O_RDONLY, os.ModePerm)
+	assert.NoError(t, err)
+	defer file.Close()
+
+	delimiters := detector.DetectDelimiter(file, '"')
+
+	assert.Equal(t, []string{","}, delimiters)
+}
+
 func TestDetectDelimiterSemicolon(t *testing.T) {
 	detector := New()
 	sampleLines := 4
